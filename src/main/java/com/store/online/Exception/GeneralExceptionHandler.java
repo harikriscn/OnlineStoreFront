@@ -39,7 +39,7 @@ public class GeneralExceptionHandler {
     	logger.debug("handleAllExceptions");
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
-        logger.debug("Exception : "+ ex.getMessage());
+        logger.debug("Exception : "+ ex.getStackTrace().toString());
         ErrorResponse error = new ErrorResponse("Server Error", details);
         return new ResponseEntity<Object>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -1,4 +1,4 @@
-package com.store.online.security;
+/*package com.store.online.security;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,19 +13,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.store.online.Service.UserDetailsServiceImpl;
 
-/**
+*//**
  * @author Harikrishnan
  *
- */
+ *//*
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-	/*
+	
 	 * @Autowired CustomAuthenticationProvider customAuthenticationProvider;
-	 */
+	 
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -55,3 +55,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 }
+*/

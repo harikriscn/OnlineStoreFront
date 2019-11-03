@@ -3,8 +3,6 @@ package com.store.online.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -15,8 +13,11 @@ import org.springframework.stereotype.Component;
 import com.online.store.Constants.StoreEnum;
 import com.store.online.Dao.CartRepository;
 import com.store.online.POJO.Cart;
+import com.store.online.POJO.Product;
 import com.store.online.POJO.ProductData;
 import com.store.online.POJO.Rule;
+
+import io.micrometer.core.instrument.util.StringUtils;
 
 /**
  * @author Harikrishnan
@@ -31,6 +32,8 @@ public class CartServiceImpl implements CartService {
 	CartRepository cartRepository;
 	
 	private double totalPrice  = 0.0;
+	
+	private String key = null;
 
 	@Override
 	public Cart createCart(List<ProductData> productDataList) {
@@ -58,6 +61,18 @@ public class CartServiceImpl implements CartService {
 		totalPrice = 0.0;
 		if(cart!= null && cart.getProductDataList().size()>0) {
 			List<ProductData> prodDataList = cart.getProductDataList();
+			List<Product> productList = new ArrayList<Product>();
+			prodDataList.forEach(data->{
+				productList.add(data.getProduct());
+			});
+			key = null;
+			Map<String, Long> departments = productList.stream().collect(Collectors.groupingBy(Product::getDepartment,Collectors.counting()));
+			
+			departments.entrySet().stream().findAny().ifPresent(entry -> {
+			      if(entry.getValue()>5) {
+			    	  key = entry.getKey();
+			    	  }
+			});
 			List<String> discounts = new ArrayList<String>();
 			prodDataList.forEach(prodData-> {
 				if(prodData != null && prodData.getProduct() != null) {
@@ -65,6 +80,11 @@ public class CartServiceImpl implements CartService {
 						double reducedPrice = prodData.getProduct().getCurrent_price()-(prodData.getProduct().getCurrent_price()/10);
 						prodData.getProduct().setCurrent_price(reducedPrice);
 						discounts.add(StoreEnum.SINGLE_ITEM_QTY_MORE_THAN_TEN.getEnumVal().toUpperCase());
+					}
+					if(StringUtils.isNotBlank(key) && key.equals(prodData.getProduct().getDepartment())) {
+						double reducedPrice = prodData.getProduct().getCurrent_price()-(prodData.getProduct().getCurrent_price()/10);
+						prodData.getProduct().setCurrent_price(reducedPrice);
+						discounts.add(StoreEnum.SINGLE_ITEM_SAME_DEPARTMENT.getEnumVal().toUpperCase());
 					}
 					totalPrice = totalPrice + (prodData.getProduct().getCurrent_price()*prodData.getQty());
 				}
